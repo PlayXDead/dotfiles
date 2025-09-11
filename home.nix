@@ -179,151 +179,117 @@
       cmp-cmdline
       lspkind-nvim
       onedark-nvim
+      tokyonight-nvim
       nvim-tree-lua
-    ];
-      extraConfig = ''
-        " General Vim settings
-        set number
-        set cursorline
-        set list
-        set termguicolors
-        syntax on
-        colorscheme onedark
- 
-   lua << EOF
-       -- =================================================================
-       -- CORE SETUP
-       -- =================================================================
-       vim.g.mapleader = " "
-       local map = vim.keymap.set
-       local opts = { silent = true, noremap = true }
-
-       -- =================================================================
-       -- PLUGIN CONFIGURATIONS
-       -- =================================================================
-       require("nvim-web-devicons").setup { default = true }
-       require("nvim-tree").setup({
-           sort_by = "name",
-           view = { width = 30, side = "left" },
-           renderer = { icons = { show = { git = true, folder = true, file = true, folder_arrow = true } } },
-           hijack_netrw = true,
-           update_focused_file = { enable = true, update_cwd = true },
-       })
-       require('lualine').setup { options = { theme = 'onedark' } }
-       require'nvim-treesitter.configs'.setup {
-           highlight = { enable = true },
-           incremental_selection = { enable = true },
-           indent = { enable = true },
-       }
-
-       -- =================================================================
-       -- OLLAMA INTEGRATION (PLENARY)
-       -- =================================================================
-       package.preload["ollama"] = function()
-           return dofile(vim.fn.stdpath("config") .. "/lua/ollama.lua")
-       end
-       vim.api.nvim_set_keymap("i", "<C-g>", "<cmd>lua require'ollama'.complete()<CR>", { noremap = true, silent = true })
-
-       -- =================================================================
-       -- LAZY-LOADED LSP CONFIGURATION
-       -- =================================================================
-       vim.api.nvim_create_autocmd("FileType", {
-           pattern = { "nix", "lua", "python", "bash", "json", "markdown", "javascript", "typescript", "dart" },
-           callback = function(event)
-               local buf = event.buf
-               local filetype = vim.bo[buf].filetype
-               local lspconfig = require('lspconfig')
-               local map_buf = function(key, func)
-                   vim.keymap.set('n', key, func, { silent = true, noremap = true, buffer = buf })
-               end
-
-               map_buf('K', vim.lsp.buf.hover)
-               map_buf('gd', vim.lsp.buf.definition)
-               map_buf('<leader>ca', vim.lsp.buf.code_action)
-
-               if filetype == "nix" then lspconfig.nil_ls.setup({})
-               elseif filetype == "lua" then lspconfig.lua_ls.setup({})
-               elseif filetype == "python" then lspconfig.pyright.setup({})
-               elseif filetype == "bash" then lspconfig.bashls.setup({})
-               elseif filetype == "json" then lspconfig.jsonls.setup({})
-               elseif filetype == "markdown" then lspconfig.marksman.setup({})
-               elseif filetype == "javascript" or filetype == "typescript" then lspconfig.tsserver.setup({})
-               elseif filetype == "dart" then lspconfig.dartls.setup({})
-               end
-           end,
-       })
-
-       -- =================================================================
-       -- KEYMAPS
-       -- =================================================================
-       map("n", "<leader>e", require("nvim-tree.api").tree.toggle, opts)
-       map("n", "<leader>h", function() require("toggleterm").toggle() end, opts)
-       map("t", "<Esc>", "<C-\\><C-n>", opts)
-       map("n", "<leader>ff", function() require("telescope.builtin").find_files() end, opts)
-       map("n", "<leader>fw", function() require("telescope.builtin").live_grep() end, opts)
-       map("n", "<leader>w", ":w<CR>", opts)
-       map("n", "<leader>q", ":q<CR>", opts)
-       map("n", "<leader>Q", ":qa!<CR>", opts)
-   EOF
-        '';
-    };
-
-    home.file.".config/nvim/lua/ollama.lua".text = ''
-        local M = {}
-        local curl = require("plenary.curl")
-
-        local function ollama_query(prompt, callback)
-            local body = string.format([[{"model":"qwen:4b","prompt":"%s"}]], prompt)
-            local res = curl.post("http://localhost:11434", {
-                body = body,
-                headers = { ["Content-Type"] = "application/json" },
-                timeout = 5000,
-            })
-
-            if res and res.status == 200 then
-                callback(res.body)
-            else
-                vim.schedule(function()
-                    print("Ollama request failed: " .. tostring(res and res.status or "no response"))
-                end)
-            end
-        end
-
-        M.query = ollama_query
-        package.preload["ollama"] = function() return M end
-
-        local cmp = require("cmp")
-        local source = {}
-        source.new = function() return setmetatable({}, { __index = source }) end
-        source.complete = function(self, request, callback)
-            local line = vim.api.nvim_get_current_line()
-            local col = vim.api.nvim_win_get_cursor(0)[2]
-            local prefix = string.sub(line, 1, col)
-            require("ollama").query(prefix, function(output)
-                vim.schedule(function()
-                    callback({ { label = output } })
-                end)
-            end)
-        end
-        source.get_trigger_characters = function() return {} end
-        source.is_available = function() return true end
-        source.get_debug_name = function() return "ollama" end
-
-        cmp.register_source("ollama", source.new())
-        cmp.setup({
-            mapping = cmp.mapping.preset.insert({
-                ["<C-Space>"] = cmp.mapping.complete(),
-                ["<CR>"] = cmp.mapping.confirm({ select = true }),
-            }),
-            sources = cmp.config.sources({
-                { name = "nvim_lsp" },
-                { name = "buffer" },
-                { name = "path" },
-                { name = "ollama" },
-            }),
+      (pkgs.vimUtils.buildVimPlugin {
+        pname = "eldritch-nvim";
+	version = "2024-09-01"; # or latest commit date
+	  src = pkgs.fetchFromGitHub {
+	    owner = "eldritch-theme";
+	    repo = "eldritch.nvim";
+	    rev = "c980caea40cab7eab2c3a467af5bab1e7e66fcce"; # or a commit hash for reproducibility
+	    sha256 = "sha256-jfxCX73BK/Px/OkcC2st2KjXqd/S9+F9aVIKyJLOB0o=";
+	  };
         })
+      ];
+      extraConfig = ''
+	" General Vim settings
+        set number
+	set cursorline
+	set list
+	set termguicolors
+	syntax on
 
-      return M
-  '';
-}
+	" =======================
+	" THEME
+	" =======================
+        lua << EOF
+	  require("eldritch").setup({
+	    transparent = false,
+	    styles = {
+	      comments = "italic",
+	      keywords = "bold",
+	      functions = "NONE",
+	      variables = "NONE",
+	    },
+	  })
+	  vim.cmd("colorscheme eldritch")
+
+	  -- =================================================================
+	  -- CORE SETUP
+	  -- =================================================================
+	  vim.g.mapleader = " "
+	  local map = vim.keymap.set
+	  local opts = { silent = true, noremap = true }
+  
+	  -- =================================================================
+	  -- PLUGIN CONFIGURATIONS
+	  -- =================================================================
+	  require("nvim-web-devicons").setup { default = true }
+	  require("nvim-tree").setup{
+	      sort_by = "name",
+	      view = { width = 30, side = "left" },
+	      renderer = { icons = { show = { git = true, folder = true, file = true, folder_arrow = true } } },
+	      hijack_netrw = true,
+	      update_focused_file = { enable = true, update_cwd = true },
+	  }
+	  require('lualine').setup { options = { theme = 'eldritch' } }
+	  require'nvim-treesitter.configs'.setup ({
+	    highlight = { enable = true },
+	    incremental_selection = { enable = true },
+	    indent = { enable = true },
+  	  })
+
+	  -- =================================================================
+	  -- OLLAMA INTEGRATION (PLENARY)
+	  -- =================================================================
+	  package.preload["ollama"] = function()
+	    return dofile(vim.fn.stdpath("config") .. "/lua/ollama.lua")
+	  end
+	  vim.api.nvim_set_keymap("i", "<C-g>", "<cmd>lua require'ollama'.complete()<CR>", { noremap = true, silent = true })
+
+	  -- =================================================================
+	  -- LAZY-LOADED LSP CONFIGURATION
+	  -- =================================================================
+	  vim.api.nvim_create_autocmd("FileType", {
+	    pattern = { "nix", "lua", "python", "bash", "json", "markdown", "javascript", "typescript", "dart" },
+	    callback = function(event)
+ 	    local buf = event.buf
+	    local filetype = vim.bo[buf].filetype
+	    local lspconfig = require('lspconfig')
+	    local map_buf = function(key, func)
+	    vim.keymap.set('n', key, func, { silent = true, noremap = true, buffer = buf })
+	  end
+
+	  map_buf('K', vim.lsp.buf.hover)
+	  map_buf('gd', vim.lsp.buf.definition)
+	  map_buf('<leader>ca', vim.lsp.buf.code_action)
+
+ 	  if filetype == "nix" then lspconfig.nil_ls.setup({})
+  	    elseif filetype == "lua" then lspconfig.lua_ls.setup({})
+	    elseif filetype == "python" then lspconfig.pyright.setup({})
+	    elseif filetype == "bash" then lspconfig.bashls.setup({})
+	    elseif filetype == "json" then lspconfig.jsonls.setup({})
+	    elseif filetype == "markdown" then lspconfig.marksman.setup({})
+	    elseif filetype == "javascript" or filetype == "typescript" then lspconfig.tsserver.setup({})
+	    elseif filetype == "dart" then lspconfig.dartls.setup({})
+	        end
+	      end,
+	    })
+
+	    -- =================================================================
+	    -- KEYMAPS
+	    -- =================================================================
+	    map("n", "<leader>e", require("nvim-tree.api").tree.toggle, opts)
+	    map("n", "<leader>h", function() require("toggleterm").toggle() end, opts)
+	    map("t", "<Esc>", "<C-\\><C-n>", opts)
+	    map("n", "<leader>ff", function() require("telescope.builtin").find_files() end, opts)
+	    map("n", "<leader>fw", function() require("telescope.builtin").live_grep() end, opts)
+	    map("n", "<leader>w", ":w<CR>", opts)
+	    map("n", "<leader>q", ":q<CR>", opts)
+	    map("n", "<leader>Q", ":qa!<CR>", opts)
+EOF
+      '';
+  };
+}  
 
