@@ -16,13 +16,16 @@ set $monitor1 "DP-2"
 set $monitor2 "HDMI-0"
 
 exec xrandr --output eDP-1-1 --mode 1920x1080
+exec xrandr --output HDMI-0 --mode 1080x1920
+exec xrandr --output HDMI-0 --rotate right
 
 # Set inner/outer gaps
 gaps inner 5
-gaps outer 4
+gaps outer 2
+gaps top 35
 
 #Smart gaps (gaps used if only more than one container on workspace)
-smart_gaps on
+#smart_gaps on
 
 #Remove Borders
 default_border none
@@ -93,6 +96,9 @@ exec --no-startup-id nm-applet
 #Restore wallpaper on startup
 exec --no-startup-id nitrogen --restore
 
+#start flameshot (screenshot)
+exec --no-startup-id flameshot
+
 # Use pactl to adjust volume in PulseAudio.
 set $refresh_i3status killall -SIGUSR1 i3status
 bindsym XF86AudioRaiseVolume exec --no-startup-id pactl set-sink-volume @DEFAULT_SINK@ +10% && $refresh_i3status
@@ -118,6 +124,8 @@ bindsym $mod+c kill
 
 # start rofi (a program launcher)
 bindsym $mod+d exec rofi -show drun
+
+bindsym Print exec flameshot gui
 
 # launch brave browser
 bindsym $mod+b exec zen
@@ -234,14 +242,12 @@ workspace $ws4 output $monitor2
 #Assign Apps to open on specific workspace
 #TIP!!!!!!!          Run xprop WM_CLASS in terminal to get window class name
 assign [class = "easyeffects"] $ws10
-assign [class = "Pavucontrol"] $ws10
 assign [class = "thunderbird"] $ws9
 assign [class = "discord"] $ws10
 assign [class = "obs"] $ws4
 assign [class = "Lutris"] $ws5
-assign [title = "Volume Control"] $ws10
-#assign [name(string) = "Overwatch"] $ws1
 
+for_window [class="Emulator"] floating enable, move position center
 
 # reload the configuration file
 bindsym $mod+Shift+c reload
@@ -285,9 +291,8 @@ bindsym $mod+r mode "resize"
 #}
 
 exec autotiling & udiskie & lxqt-policykit-agent 
-exec_always --no-startup-id $HOME/.config/polybar/polybar.sh
+exec_always polybar mybar & polybar mybar2
 exec --no-startup-id dunst
 exec --no-starup-id picom --config $HOME/.config/picom/picom.conf -b
-exec --no-startup-id tint2
 exec xrandr --output DP-2 --primary && xrandr --output HDMI-0 --right-of DP-2
 
