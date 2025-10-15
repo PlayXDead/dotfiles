@@ -27,8 +27,9 @@ gaps top 35
 #Smart gaps (gaps used if only more than one container on workspace)
 #smart_gaps on
 
-#Remove Borders
-default_border none
+# Borders - set to none to disable -  pixel 2 for border enable
+default_border pixel 4
+smart_borders on
 
 # Press $mod+Shift+g to enter the gap mode. Choose o or i for modifying outer/inner gaps. Press one of + / - (in-/decrement for current workspace) or 0 (remove gaps for current workspace). If you also press Shift with these keys, the change will be global for all workspaces.
 set $mode_gaps Gaps: (o) outer, (i) inner
