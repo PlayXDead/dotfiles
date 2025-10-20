@@ -15,13 +15,13 @@ set $mod Mod4
 set $monitor1 "DP-2"
 set $monitor2 "HDMI-0"
 
-exec xrandr --output eDP-1-1 --mode 1920x1080
-exec xrandr --output HDMI-0 --mode 1080x1920
-exec xrandr --output HDMI-0 --rotate right
+exec_always xrandr --output eDP-1-1 --mode 1920x1080 --primary
+exec_always xrandr --output HDMI-0 --mode 1080x1920
+exec_always xrandr --output HDMI-0 --rotate right
 
 # Set inner/outer gaps
-gaps inner 5
-gaps outer 2
+gaps inner 4
+gaps outer 0
 gaps top 35
 
 #Smart gaps (gaps used if only more than one container on workspace)
@@ -29,7 +29,10 @@ gaps top 35
 
 # Borders - set to none to disable -  pixel 2 for border enable
 default_border pixel 4
-smart_borders on
+#smart_borders on
+# The last set of numbers determine border color
+client.focused #02e871 #02e871 #02e871 #2e9ef4 #02e871
+client.unfocused #FF0000 #4c7899 #FFFFFF #2e9ef4 #067062
 
 # Press $mod+Shift+g to enter the gap mode. Choose o or i for modifying outer/inner gaps. Press one of + / - (in-/decrement for current workspace) or 0 (remove gaps for current workspace). If you also press Shift with these keys, the change will be global for all workspaces.
 set $mode_gaps Gaps: (o) outer, (i) inner
@@ -128,17 +131,17 @@ bindsym $mod+d exec rofi -show drun
 
 bindsym Print exec flameshot gui
 
-# launch brave browser
-bindsym $mod+b exec zen
-
-# launch firefox browser
-bindsym $mod+Shift+f exec firefox
+# launch brave firefox
+bindsym $mod+b exec firefox
 
 # launch thunderbird email client
 bindsym $mod+t exec thunderbird
 
 # launch file explorer
 bindsym $mod+e exec nautilus
+
+# launch emojimart
+bindsym $mod+period exec flatpak run io.github.vemonet.EmojiMart
 
 # A more modern dmenu replacement is rofi:
 # bindcode $mod+40 exec "rofi -modi drun,run -show drun"
@@ -248,7 +251,8 @@ assign [class = "discord"] $ws10
 assign [class = "obs"] $ws4
 assign [class = "Lutris"] $ws5
 
-for_window [class="Emulator"] floating enable, move position center
+for_window [class="Emulator"] floating enable
+for_window [class="Emoji-mart"] floating enable, move position center
 
 # reload the configuration file
 bindsym $mod+Shift+c reload
@@ -291,8 +295,8 @@ bindsym $mod+r mode "resize"
 #        status_command i3status
 #}
 
-exec autotiling & udiskie & lxqt-policykit-agent 
-exec_always polybar mybar & polybar mybar2
+exec udiskie & lxqt-policykit-agent 
+exec_always polybar mybar & polybar mybar2 & autotiling
 exec --no-startup-id dunst
 exec --no-starup-id picom --config $HOME/.config/picom/picom.conf -b
 exec xrandr --output DP-2 --primary && xrandr --output HDMI-0 --right-of DP-2
