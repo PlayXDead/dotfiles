@@ -19,9 +19,9 @@
 
 * {
 	text-shadow: none; box-shadow: none; border: none;
-  border-radius: 0;
-	font-family: "Segoe UI", "Ubuntu";
-  font-weight: 600;
+  border-radius: 24;
+	font-family: "JetBrainsMono Nerd Font";
+  font-weight: 800;
   font-size: 12.7px;
 	
 	
@@ -29,7 +29,8 @@
 
 window#waybar {
   background:  @bg_main;
-  border-top: 1px solid @border_main;
+  border-top: 2px solid @border_main;
+  border-bottom: 2px solid @border_main;
   color: @content_main;
 }
 
@@ -44,11 +45,11 @@ tooltip label{
   color: @content_main;
 }
 
-#custom-os_button {
+custom-os_button {
 	font-family: "JetBrainsMono Nerd Font";
   font-size: 24px;
-	padding-left: 12px;
-	padding-right: 20px;
+	padding-left: 16px;
+	padding-right: 80px;
 	transition: all 0.25s cubic-bezier(0.165, 0.84, 0.44, 1);
 }
 #custom-os_button:hover {
