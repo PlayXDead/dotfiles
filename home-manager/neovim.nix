@@ -1,218 +1,8 @@
+#=======================================================================================
+#NEOVIM - ENHANCED FLUTTER DEVELOPMENT
+#=======================================================================================
 { pkgs, ... }:
 {
-  home.username = "tim";
-  home.homeDirectory = "/home/tim";
-  home.stateVersion = "25.05";
-
-  #===============================================================
-  #PROGRAMS
-  #===============================================================
-  programs.nix-search-tv.enable = true;
-
-  #==================================================================================
-  #SERVICES
-  #==================================================================================
-  services.ollama = {
-    enable = true;
-    port = 11434;
-    acceleration = "cuda";
-    environmentVariables = {
-      OLLAMA_FLASH_ATTENTION="True";
-      OLLAMA_KV_CACHE_TYPE="f16";
-    };
-  };
-
-  #======================================================================================
-  #PACKAGES
-  #======================================================================================
-  home.packages = with pkgs; [
-    fd
-    tree-sitter
-    nodejs
-    dart
-    lua-language-server
-    typescript-language-server
-    bash-language-server
-    pyright
-    nil
-    marksman
-    aider-chat
-    firefox
-    brave
-    tree
-    discord
-    gnome-software
-    swww
-    nwg-drawer
-    waybar
-    waypaper
-    swaybg
-    exfatprogs
-    gparted
-    gnome-disk-utility
-    looking-glass-client
-    qemu
-    libguestfs
-    guestfs-tools
-    OVMFFull
-    dnsmasq
-    cpuset
-    rofi
-    prismlauncher
-    fzf
-    tlrc
-    neofetch
-    cmatrix
-    findutils
-    nvtopPackages.full
-    mediawriter
-    nmap
-    gh
-    obsidian
-    keepass
-    hyprlock
-    easyeffects
-    openvpn
-    lutris
-    winetricks
-    tor-browser
-    libsForQt5.okular
-    anki
-    distrobox
-    libreoffice-fresh
-    thunderbird
-    nitrogen
-    jq
-    gimp
-    rawtherapee
-    file-roller
-    shotwell
-    nautilus
-    lxappearance
-    kdePackages.kcalc
-    appimage-run
-    flameshot
-    vlc
-    ranger
-    speedtest-cli
-    axel
-    lsd
-    ffmpeg
-    ncdu
-    flowtime
-    mousam
-    teams-for-linux
-    teamspeak_client
-    stacer
-    fwknop
-    wireguard-tools
-    bottles
-    pdfarranger
-    googleearth-pro
-    qgis-ltr
-    devbox
-    vrc-get
-    wlx-overlay-s
-    blender
-    bs-manager
-    hyprshot
-    xmind
-    zoxide
-    vscode
-    dunst
-    ripgrep
-    stylua
-    xclip
-    wireshark
-    pulseaudio
-    glow #view markdown  in the terminal  
-  ];
-
-  nixpkgs.config.allowUnfree = true;
-  nixpkgs.config.permittedInsecurePackages = [
-    "googleearth-pro-7.3.6.10201"
-    "electron-25.9.0"
-  ];
-
-  #======================================================================================
-  #ALACRITTY TERMINAL CONFIGURATION
-  #======================================================================================
-  programs.alacritty = {
-    enable = true;
-    settings = {
-      font = {
-        normal = {
-          family = "JetBrains Mono Nerd Font";
-          style = "Regular";
-        };
-        bold = {
-          family = "JetBrains Mono Nerd Font";
-          style = "Bold";
-        };
-        italic = {
-          family = "JetBrains Mono Nerd Font";
-          style = "Italic";
-        };
-        bold_italic = {
-          family = "JetBrains Mono Nerd Font";
-          style = "Bold Italic";
-        };
-        size = 12;
-      };
-      
-      env = {
-        TERM = "alacritty";
-      };
-      
-      window = {
-        opacity = 0.95;
-        blur = true;
-        padding = {
-          x = 6;
-          y = 6;
-        };
-      };
-      
-      colors = {
-        primary = {
-          background = "#212337";
-          foreground = "#ebfafa";
-        };
-        normal = {
-          black = "#37384d";
-          red = "#f16c75";
-          green = "#04d1f9";
-          yellow = "#f1fc79";
-          blue = "#7081d0";
-          magenta = "#a48cf2";
-          cyan = "#04d1f9";
-          white = "#ebfafa";
-        };
-        bright = {
-          black = "#323449";
-          red = "#f16c75";
-          green = "#04d1f9";
-          yellow = "#f1fc79";
-          blue = "#7081d0";
-          magenta = "#a48cf2";
-          cyan = "#04d1f9";
-          white = "#ebfafa";
-        };
-      };
-      
-      cursor = {
-        style = {
-          shape = "Beam";
-          blinking = "On";
-        };
-        blink_interval = 500;
-      };
-    };
-  };
-
-  #=======================================================================================
-  #NEOVIM - ENHANCED FLUTTER DEVELOPMENT
-  #=======================================================================================
   programs.neovim = {
     enable = true;
     viAlias = true;
@@ -794,39 +584,18 @@
       -- =================================================================
       -- LSP CONFIGURATION
       -- =================================================================
-      vim.api.nvim_create_autocmd("FileType", {
-        pattern = { "nix", "lua", "python", "bash", "json", "markdown", "javascript", "typescript" },
-        callback = function(event)
-          local buf = event.buf
-          local filetype = vim.bo[buf].filetype
-          local lspconfig = require('lspconfig')
-          
-          if filetype == "nix" then
-            lspconfig.nil_ls.setup({})
-          elseif filetype == "lua" then
-            lspconfig.lua_ls.setup({
-              settings = {
-                Lua = {
-                  diagnostics = {
-                    globals = { 'vim' }
-                  }
-                }
-              }
-            })
-          elseif filetype == "python" then
-            lspconfig.pyright.setup({})
-          elseif filetype == "bash" then
-            lspconfig.bashls.setup({})
-          elseif filetype == "json" then
-            lspconfig.jsonls.setup({})
-          elseif filetype == "markdown" then
-            lspconfig.marksman.setup({})
-          elseif filetype == "javascript" or filetype == "typescript" then
-            lspconfig.tsserver.setup({})
-          end
-          -- Note: Dart LSP is handled exclusively by flutter-tools
-        end,
-      })
+      vim.lsp.enable({'nil_ls', 'lua_ls', 'pyright', 'bashls', 'jsonls', 'marksman', 'ts_ls'})
+
+      -- Configure lua_ls with custom settings
+      vim.lsp.config.lua_ls = {
+        settings = {
+          Lua = {
+            diagnostics = {
+              globals = { 'vim' }
+            }
+          }
+        }
+      }
 
       -- =================================================================
       -- GENERAL KEYMAPS
@@ -853,6 +622,10 @@
       -- Move lines
       map("v", "J", ":m '>+1<CR>gv=gv", opts)
       map("v", "K", ":m '<-2<CR>gv=gv", opts)
+
+      -- Keep visual selection when indenting
+      map("v", "<", "<gv", opts)
+      map("v", ">", ">gv", opts)
       
       EOF
     '';
